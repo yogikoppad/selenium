@@ -1,0 +1,2045 @@
+Mine--
+CONNECTION--
+package code;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+
+public class Connection
+ {
+ public	static String URL="https://www.spicejet.com";
+
+ public static WebDriver getBrowser(String browserType){
+	 WebDriver driver;
+	 //
+	 switch(browserType) {
+	 case "firefox":
+		 System.setProperty("webdriver.chrome.driver", "address");
+		 driver= new FirefoxDriver();
+		 break;
+	 case "chrome":
+		 System.setProperty("webdriver.chrome.driver", "F:\\Selenium_Jars\\new chromedriver_win32 (1)\\chromedriver.exe");
+		 driver= new ChromeDriver();
+		 break;
+	 case "ie":
+		 System.setProperty("webdriver.chrome.driver", "address");
+		 driver=new InternetExplorerDriver();
+		 break;
+	default:
+		System.out.println("Since driver provided by you not found launching chrome as default browser");
+		System.setProperty("webdriver.chrome.driver", "address");
+		driver= new ChromeDriver();
+	 }
+	 driver.navigate().to(URL);
+	 return driver;
+	 //Is navigation same in all browsers?
+	 
+ }
+
+}
+
+
+EXCEL--
+
+package code;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.apache.poi.xssf.usermodel.*;
+
+
+public class excelutils {
+ public static String getData(String sheetname, int rownum, int colnum) throws FileNotFoundException {
+	 String data=null;
+	 FileInputStream file= new FileInputStream("C:\\Users\\Chirantan shukla\\eclipse-workspace\\Spicejet\\src\\code\\Test_Data.xlsx");
+	 try {
+		XSSFWorkbook book=  new XSSFWorkbook(file);
+		XSSFSheet sheet= book.getSheet(sheetname);
+		XSSFRow row=sheet.getRow(rownum);
+		XSSFCell cell= row.getCell(colnum);
+		data= cell.getStringCellValue();
+		book.close();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	 return data;
+ }
+}
+
+
+MAIN-
+package code;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.apache.commons.io.FileUtils;
+import org.junit.*;
+
+public class Search extends Connection {
+public static WebDriver driver;
+@Before
+public  void setup() {
+	driver= getBrowser("chrome");
+	driver.manage().window().maximize();
+	driver.manage().timeouts().pageLoadTimeout(20,TimeUnit.SECONDS);
+}
+@Test
+public void getFlightDetails() throws InterruptedException, IOException {
+	WebElement roundTrip=driver.findElement(By.xpath("//*[@id=\"ctl00_mainContent_rbtnl_Trip_1\"]"));
+	roundTrip.click();
+	WebElement From = driver.findElement(By.xpath("//*[@id=\"ctl00_mainContent_ddl_originStation1_CTXT\"]"));
+	new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOf(From));	
+	System.out.println(excelutils.getDa dffta("Sheet1", 1, 0));
+	From.sendKeys(excelutils.getData("Sheet1", 1, 0));
+	From.sendKeys(Keys.TAB);
+	Thread.sleep(2500);
+	
+	WebElement To = driver.findElement(By.xpath("//*[@id=\"ctl00_mainContent_ddl_destinationStation1_CTXT\"]"));
+	new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(To));
+	To.sendKeys("CJB");
+	Thread.sleep(2500);
+//	driver.findElement(By.xpath("//*[@id=\"ctl00_mainContent_view_date1\"]")).click();
+	driver.findElement(By.xpath("//*[@id=\"ui-datepicker-div\"]/div[1]/table/tbody/tr[4]/td[5]/a")).click();
+//date need to be discussed
+	Thread.sleep(2500);
+	//driver.findElement(By.xpath("//*[@id=\"divpaxinfo\"]")).click();
+driver.findElement(By.xpath("//*[@id=\"divpaxOptions\"]")).click();
+Thread.sleep(25000);
+driver.findElement(By.xpath("//*[@id=\"ctl00_mainContent_ddl_Adult\"]/option[2]")).click();
+driver.findElement(By.xpath("//*[@id=\"ctl00_mainContent_btn_FindFlights\"]")).click();
+WebElement flight =driver.findElement(By.xpath("//*[@id=\"activateJourney_0_0_0_0\"]/span"));
+new WebDriverWait(driver, 25000).until(ExpectedConditions.visibilityOf(flight));
+System.out.println(flight.getText());
+File src= ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+FileUtils.copyFile(src, new File("C:\\Users\\Chirantan shukla\\eclipse-workspace\\Spicejet\\src\\code\\error.png"));
+
+Thread.sleep(25000);
+	
+	driver.findElement(By.xpath("//*[@id=\"ui-datepicker-div\"]/table/tbody/tr[5]/td[4]/a")).click();
+	System.out.println("date is selected");
+	
+	//WebElement date=driver.findElement(By.xpath("//*[@id=\"ui-datepicker-div\"]/table/tbody/tr[4]/td[5]"));
+	
+	//new WebDriverWait(driver, 2500).until(ExpectedConditions.visibilityOf(date));
+	
+	//date.click();
+
+	Thread.sleep(25000);
+	driver.findElement(By.xpath("//*[@id=\"ctl00_mainContent_view_date2\"]")).click();
+	driver.findElement(By.xpath("//*[@id=\"ui-datepicker-div\"]/table/tbody/tr[5]/td[4]/a")).click();
+}
+
+@After
+public  void endsession(){
+	driver.quit();
+}
+}
+
+
+
+
+Chaitanya--
+Class driverSetup
+package clearTrip;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+public class driversetup
+{
+	
+	public static String Url="https://www.cleartrip.com/";
+	
+	public WebDriver setupChrome()
+	{
+		System.setProperty("webdriver.chrome.driver","C:\\Users\\user\\Desktop\\exes\\chromedriver.exe");
+		WebDriver driver= new ChromeDriver();
+		driver.navigate().to(Url);
+		return driver;
+		
+	}
+	
+	public WebDriver setupFirefox()
+	{
+		WebDriver driver = new FirefoxDriver();
+		driver.navigate().to(driversetup.Url);
+		return driver;
+		
+	}
+
+}
+
+
+
+
+Class excelutils
+
+package clearTrip;
+
+import java.io.FileInputStream;
+
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class excelutils {
+
+	public static String getCellValue(String sheetName,int rowNum,int colNum) throws Exception
+	{
+		String CellValue=null;
+		try
+		{
+			FileInputStream excelfile=new FileInputStream("C:\\Users\\user\\eclipse-workspace\\ClearTrip\\excel\\25415.xlsx");
+			XSSFWorkbook workbook=new XSSFWorkbook(excelfile);
+			XSSFSheet sheet=workbook.getSheet(sheetName);
+			XSSFRow row=sheet.getRow(rowNum);
+			XSSFCell cell=row.getCell(colNum);
+			CellValue=cell.getStringCellValue();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			
+		}
+		return CellValue;
+		
+	}
+}
+
+
+Class search
+
+package clearTrip;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+public class search extends driversetup
+{
+	WebDriver driver;
+	@BeforeMethod
+	public void test()
+	{
+		driver=setupChrome();
+		driver.manage().window().maximize();
+	}
+	@Test(priority=1)
+	public void searching() throws Exception
+	{
+	  driver.findElement(By.xpath("//*[@id=\"RoundTrip\"]")).click();
+	  Thread.sleep(1000);
+	  WebElement ac=driver.findElement(By.xpath("//*[@id=\"FromTag\"]"));
+	  ac.sendKeys(excelutils.getCellValue("Sheet1", 0, 0));
+	  ac.sendKeys(Keys.DOWN);
+	  ac.sendKeys(Keys.ENTER);
+	  Thread.sleep(1000);
+		  WebElement ab=driver.findElement(By.xpath("//*[@id=\"ToTag\"]"));
+	  ab.sendKeys(excelutils.getCellValue("Sheet1", 0, 1));
+	  ab.sendKeys(Keys.ENTER);
+	  Thread.sleep(1000);
+	  
+	  
+	  driver.findElement(By.xpath("//*[@id=\"DepartDate\"]")).click();
+	  driver.findElement(By.xpath("//*[text()='19']")).click();
+	  Thread.sleep(1500);
+	  
+	  driver.findElement(By.xpath("//*[@id=\"ui-datepicker-div\"]/div[2]/table/tbody/tr[4]/td[2]/a")).click();
+	  Thread.sleep(1500);
+	  
+	  Select sc=new Select (driver.findElement(By.xpath("//*[@id=\"Adults\"]")));
+	  sc.selectByIndex(4);
+	  Thread.sleep(1500);
+	  
+	  driver.findElement(By.xpath("//*[@id=\"SearchBtn\"]")).click();
+	  Thread.sleep(25000);
+	}
+
+
+@AfterMethod
+public void exit()
+		{
+	driver.quit();
+		}
+
+}
+
+
+
+
+
+
+
+
+Prakash----
+Multiple Browsers:
+
+
+
+public static String Url="https://www.cleartrip.com/";
+
+
+
+public WebDriver setupChrome()
+
+
+
+{
+
+
+
+
+
+System.setProperty("webdriver.chrome.driver","C:\\Users\\user\\Desktop\\exes\\chromedriver.exe");
+
+
+
+WebDriver driver= new ChromeDriver();
+
+
+
+driver.navigate().to(Url);
+
+
+
+return driver;
+
+
+
+}
+
+
+
+public WebDriver setupFirefox()
+
+
+
+{
+
+
+
+WebDriver driver = new FirefoxDriver();
+
+
+
+driver.navigate().to(driversetup.Url);
+
+
+
+return driver;
+
+
+
+}
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+Excel:
+
+
+
+Excel:
+
+
+
+package cleartrip;
+
+
+
+import java.io.FileInputStream;
+
+import java.io.FileNotFoundException;
+
+import java.io.IOException;
+
+
+
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+
+
+public class excel
+
+{
+
+ public static String Value1;
+
+ public static String Value2;
+
+ public static String getvalue1() throws Exception
+
+ {
+
+ FileInputStream fi = new FileInputStream("C:\\Users\\Administrator\\Desktop\\Excel\\TestData.xlsx");
+
+ XSSFWorkbook wb = new XSSFWorkbook(fi);
+
+ XSSFSheet sh = wb.getSheet("Sheet1");
+
+
+
+ Value1 = sh.getRow(0).getCell(0).getStringCellValue();
+
+ return Value1;
+
+
+
+ }
+
+ public static String getvalue2() throws Exception
+
+ {
+
+
+
+
+
+ FileInputStream fi = new FileInputStream("C:\\Users\\Administrator\\Desktop\\Excel\\TestData.xlsx");
+
+ XSSFWorkbook wb = new XSSFWorkbook(fi);
+
+ XSSFSheet sh = wb.getSheet("Sheet1");
+
+
+
+ Value2 = sh.getRow(0).getCell(1).getStringCellValue();
+
+ return Value2;
+
+
+
+ }
+
+
+
+}
+
+
+
+//If you use Excel then in main functionality we need to write below code
+
+Excel: we.sendKeys(excel.getvalue1());
+
+        we.sendKeys(Keys.ENTER);
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+1) ClearTrip:
+
+
+
+
+
+package Cleartrippack;
+
+
+
+import java.util.concurrent.TimeUnit;
+
+
+
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.Keys;
+
+import org.openqa.selenium.WebDriver;
+
+import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import org.openqa.selenium.support.ui.Select;
+
+import org.testng.annotations.AfterMethod;
+
+import org.testng.annotations.BeforeMethod;
+
+import org.testng.annotations.Test;
+
+
+
+public class clear {
+
+        public static WebDriver driver;
+
+
+
+        @BeforeMethod
+
+        public void beforeMethod() throws Exception {
+
+                /*ChromeOptions chromeOptions = new ChromeOptions();
+
+                chromeOptions.addArguments("--disable-notifications");
+
+                driver = new ChromeDriver(chromeOptions);
+
+
+
+                driver.manage().window().maximize();
+
+
+
+                driver.manage().timeouts().implicitlyWait(60,TimeUnit.SECONDS);
+
+                driver.get("https://www.cleartrip.com/");
+
+                Thread.sleep(3000); */
+
+         driver = new ChromeDriver();
+
+
+
+       driver.get("https://www.cleartrip.com");
+
+
+
+       Thread.sleep(2000);
+
+        }
+
+
+
+        @Test
+
+        public void test() throws Exception
+
+        {
+
+                driver.findElement(By.xpath("//*[@id=\'RoundTrip\']")).click();
+
+                WebElement we = driver.findElement(By.xpath("//*[@id=\'FromTag\']"));
+
+                we.sendKeys("Kolkata, IN - Netaji Subhas Chandra Bose Airport (CCU)");
+
+                we.sendKeys(Keys.TAB);
+
+                Thread.sleep(2000);//
+
+                WebElement wc = driver.findElement(By.xpath("//*[@id=\'ToTag\']"));
+
+
+
+                wc.sendKeys("Chennai, IN - Chennai Airport (MAA)");
+
+                wc.sendKeys(Keys.TAB);
+
+                Thread.sleep(2000);//
+
+                driver.findElement(By.xpath("//*[@id=\'DepartDate\']")).click();
+
+                driver.findElement(By.xpath("//*[@id=\'ui-datepicker-div\']/div[1]/table/tbody/tr[4]/td[3]/a")).click();
+
+                Thread.sleep(3000);
+
+                driver.findElement(By.xpath("//*[@id=\'ReturnDate\']")).click();
+
+                driver.findElement(By.xpath("//*[@id=\'ui-datepicker-div\']/div[1]/table/tbody/tr[4]/td[5]/a")).click();
+
+                Thread.sleep(2000);
+
+
+
+                Select sc = new Select(driver.findElement(By.xpath("//*[@id='Adults']")));
+
+                sc.selectByIndex(4);
+
+                Thread.sleep(2000);
+
+
+
+                driver.findElement(By.xpath("//*[@id='SearchBtn']")).click();
+
+
+
+                Thread.sleep(25000);
+
+                String DepartureTime = driver.findElement(By.xpath("//*[@id=\'flightForm\']/section[2]/div[4]/div[1]/nav/ul/li[1]/div/label/table/tbody/tr[1]/th[3]")).getText();
+
+                System.out.println("Departure Time= "+DepartureTime);
+
+                String ArrivalTime = driver.findElement(By.xpath("//*[@id=\"flightForm\"]/section[2]/div[4]/div[1]/nav/ul/li[1]/div/label/table/tbody/tr[1]/th[4]")).getText();
+
+                System.out.println("Arrival Time= "+ArrivalTime);
+
+        }
+
+        @AfterMethod
+
+         public void exit()
+
+         {
+
+                driver.quit();
+
+         }
+
+
+
+}
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+2) Indigo:
+
+
+
+package Cleartrippack;
+
+
+
+import java.util.concurrent.TimeUnit;
+
+
+
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.Keys;
+
+import org.openqa.selenium.WebDriver;
+
+import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import org.testng.annotations.AfterMethod;
+
+import org.testng.annotations.BeforeMethod;
+
+import org.testng.annotations.Test;
+
+
+
+public class Indigo {
+
+    public static WebDriver driver;
+
+
+
+   @BeforeMethod
+
+   public void beforeMethod() throws Exception {
+
+          /* ChromeOptions chromeOptions = new ChromeOptions();
+
+           chromeOptions.addArguments("--disable-notifications");
+
+           driver = new ChromeDriver(chromeOptions);
+
+
+
+           driver.manage().window().maximize();
+
+
+
+           driver.manage().timeouts().implicitlyWait(60,TimeUnit.SECONDS);*/
+
+   driver = new ChromeDriver();
+
+           driver.get("https://www.goindigo.in/");
+
+           Thread.sleep(3000);
+
+   }
+
+
+
+   @Test
+
+   public void test() throws Exception
+
+   { driver.findElement(By.xpath("//*[@id='roundTrip']")).click();
+
+   WebElement we = driver.findElement(By.xpath("(//*[@name='or-src'])"));
+
+    we.clear();
+
+   // we.sendKeys("Kolkata, IN - Netaji Subhas Chandra Bose Airport (CCU)");
+
+    we.sendKeys("Kolkata");
+
+   we.sendKeys(Keys.ARROW_DOWN);
+
+   we.sendKeys(Keys.ENTER);
+
+
+
+
+
+    WebElement wc= driver.findElement(By.xpath("(//*[@name='or-dest'])"));
+
+wc.clear();
+
+   wc.sendKeys("Chennai, IN - Chennai Airport (MAA)");
+
+   // wc.sendKeys("Chennai");
+
+   // wc.sendKeys(Keys.ARROW_DOWN);
+
+   wc.sendKeys(Keys.ENTER);
+
+   Thread.sleep(2000);
+
+   driver.findElement(By.xpath("(//*[@name='or-depart'])")).click();
+
+   driver.findElement(By.xpath("(//*[text()='15'])[1]")).click();
+
+   Thread.sleep(3000);
+
+   driver.findElement(By.xpath("(//*[@name='or-return'])")).click();
+
+   driver.findElement(By.xpath("(//*[text()='18'])[1]")).click();
+
+   Thread.sleep(2000);
+
+
+
+    //Select sc = new Select(driver.findElement(By.xpath("//*[@id='Adults']")));
+
+   //sc.selectByIndex(4);
+
+   //Thread.sleep(2000);
+
+
+
+    driver.findElement(By.xpath("//button[@type='submit']")).click();
+
+
+
+    Thread.sleep(25000);
+
+   //if they ask to print something then just change xpath
+
+
+
+  /* String DepartureTime = driver.findElement(By.xpath("//*[@id=\'flightForm\']/section[2]/div[4]/div[1]/nav/ul/li[1]/div/label/table/tbody/tr[1]/th[3]")).getText();
+
+  System.out.println("Departure Time= "+DepartureTime);
+
+  String ArrivalTime = driver.findElement(By.xpath("//*[@id=\"flightForm\"]/section[2]/div[4]/div[1]/nav/ul/li[1]/div/label/table/tbody/tr[1]/th[4]")).getText();
+
+  System.out.println("Arrival Time= "+ArrivalTime);*/
+
+   }
+
+   @AfterMethod
+
+   public void exit()
+
+   {
+
+          driver.quit();
+
+   }
+
+
+
+}
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+3) AxisBank:
+
+
+
+package Cleartrippack;
+
+
+
+
+
+
+
+import org.testng.annotations.Test;
+
+import org.testng.annotations.Test;
+
+
+
+import java.util.concurrent.TimeUnit;
+
+
+
+import org.openqa.selenium.Alert;
+
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.JavascriptExecutor;
+
+import org.openqa.selenium.Keys;
+
+import org.openqa.selenium.WebDriver;
+
+import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import org.testng.annotations.AfterMethod;
+
+import org.testng.annotations.AfterTest;
+
+import org.testng.annotations.BeforeMethod;
+
+import org.testng.annotations.BeforeTest;
+
+import org.testng.annotations.Test;
+
+
+
+
+
+
+
+public class AxisBank {
+
+
+
+
+
+        public static WebDriver driver;
+
+
+
+
+
+        @BeforeMethod
+
+        public void beforeMethod() throws Exception {
+
+
+
+                //System.setProperty("webdriver.chrome.driver", "D:\\Selenium Training\\chrome driver 2.45\\chromedriver_win32\\chromedriver.exe");
+
+                //to disable notifications
+
+                ChromeOptions chromeOptions = new ChromeOptions();
+
+                chromeOptions.addArguments("--disable-notifications");
+
+                driver = new ChromeDriver(chromeOptions);
+
+
+
+                //to maximize the window size
+
+                driver.manage().window().maximize();
+
+
+
+                //Adding wait time implicitly and launching the Website link
+
+                driver.manage().timeouts().implicitlyWait(60,TimeUnit.SECONDS);
+
+         //driver = new ChromeDriver();
+
+                driver.get("https://www.axisbank.com/personal/calculators/fd-monthly-investment-calculator");
+
+                Thread.sleep(3000);
+
+        }
+
+
+
+        @Test
+
+        public void test() throws Exception
+
+        {
+
+         //driver.switchTo().frame("notification-frame-~2514428c7");
+
+
+
+          //name="notification-frame-~2514428c7"
+
+          //driver.findElement(By.xpath("//*[@id='nvpush_cross']/svg/g/path")).click();
+
+          //Thread.sleep(2000);
+
+
+
+
+
+                //selecting the type of deposit as monthly investment
+
+                WebElement typeOfDeposit = driver.findElement(By.xpath("//div//div//a[contains(text(),'Monthly Investment')]"));
+
+                typeOfDeposit.click();
+
+                Thread.sleep(2000);
+
+
+
+    WebElement monthlyInvestment = driver.findElement(By.xpath("//div[normalize-space(text())='Type of Deposit']//div//ul//a[normalize-space(text())='Monthly Investment']"));
+
+    monthlyInvestment.click();
+
+    Thread.sleep(5000);
+
+
+
+    //Entering the amount of deposit as 30000
+
+    WebElement amountToDeposit = driver.findElement(By.xpath("//div//input[@class='form-control txtAmount']"));
+
+    amountToDeposit.clear();
+
+    amountToDeposit.sendKeys("30000");
+
+
+
+    //displaying the interest Rate
+
+    String interestRate = driver.findElement(By.xpath("//div[@class='interest_rate']//span[@class='inst_amt']")).getText();
+
+    System.out.println("Interest Rate = " + interestRate);
+
+
+
+    //calculating
+
+    WebElement calculate = driver.findElement(By.xpath("//div//a[normalize-space(text())='Calculate']"));
+
+    calculate.click();
+
+    Thread.sleep(5000);
+
+
+
+    //Displaying the Maturity Amount
+
+    String GrossTotal = driver.findElement(By.xpath("//span[@class='maturity_amt grossTotal']")).getText();
+
+    System.out.println("Maturity Amount = " + GrossTotal);
+
+
+
+
+
+        }
+
+
+
+        @AfterMethod
+
+        public void exit()
+
+        {
+
+                driver.quit();
+
+        }
+
+
+
+}
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+
+4) 91Mobile:
+
+
+
+package Cleartrippack;
+
+
+
+import java.util.concurrent.TimeUnit;
+
+
+
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.WebDriver;
+
+import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import org.openqa.selenium.interactions.Actions;
+
+import org.testng.annotations.AfterMethod;
+
+import org.testng.annotations.BeforeMethod;
+
+import org.testng.annotations.Test;
+
+public class Mobile91 {
+
+    public static WebDriver driver;
+
+
+
+  @BeforeMethod
+
+  public void beforeMethod() throws Exception {
+
+          /* ChromeOptions chromeOptions = new ChromeOptions();
+
+          chromeOptions.addArguments("--disable-notifications");
+
+          driver = new ChromeDriver(chromeOptions);
+
+
+
+          driver.manage().window().maximize();
+
+
+
+          driver.manage().timeouts().implicitlyWait(60,TimeUnit.SECONDS);*/
+
+   driver = new ChromeDriver();
+
+          driver.get("https://www.91mobiles.com/");
+
+          Thread.sleep(3000);
+
+  }
+
+
+
+  @Test
+
+  public void test() throws Exception
+
+  {
+
+  String Title=driver.getTitle();
+
+  System.out.println(Title);
+
+  //Thread.sleep(5000);
+
+  //driver.findElement(By.className("tiker_input mini_finder_input_1")).click();
+
+  // driver.findElement(By.className("tiker_input mini_finder_input_1")).clear();
+
+  driver.findElement(By.xpath("//input[@class='tiker_input mini_finder_input_1'] ")).clear();
+
+  driver.findElement(By.xpath("//input[@class='tiker_input mini_finder_input_1'] ")).sendKeys("5000");
+
+
+
+  driver.findElement(By.xpath("//input[@class='tiker_input mini_finder_input_2'] ")).clear();
+
+  driver.findElement(By.xpath("//input[@class='tiker_input mini_finder_input_2'] ")).sendKeys("10000");
+
+  //Thread.sleep(2000);
+
+  driver.findElement(By.xpath("//*[@class=\"view_details_btn find_mob mini_finder_btn enabled\"]")).click();
+
+  ////*[@id="price_box"]
+
+  Thread.sleep(3000);
+
+  driver.findElement(By.xpath("//*[@id=\"price_box\"]")).click();
+
+Thread.sleep(3000);
+
+  driver.findElement(By.xpath("//*[@id=\"price_box\"]")).click();
+
+  Thread.sleep(3000);
+
+String a=driver.findElement(By.xpath("(//*[@class=\"hover_blue_link name gaclick\"])[1]")).getText();
+
+System.out.println("First mobile name :"+a);
+
+String b=driver.findElement(By.xpath("(//*[@class=\"price price_padding\"])[1]")).getText();
+
+System.out.println("price1 :"+b);
+
+driver.findElement(By.xpath("//*[@id=\"price_box\"]")).click();
+
+
+
+Thread.sleep(5000);
+
+String c=driver.findElement(By.xpath("(//*[@class=\"hover_blue_link name gaclick\"])[1]")).getText();
+
+System.out.println("Second mobile name :"+c);
+
+String d=driver.findElement(By.xpath("(//*[@class=\"price price_padding\"])[1]")).getText();
+
+System.out.println("price2 :"+d);
+
+Thread.sleep(2000);
+
+//*[@id="gnav"]/div/div/div[1]/a/img
+
+driver.findElement(By.xpath("(//*[@alt=\"Mobile Price India | 91mobiles.com\"])[1]")).click();
+
+
+
+}
+
+  @AfterMethod
+
+  public void exit()
+
+  {
+
+         driver.quit();
+
+  }
+
+}
+
+
+
+------------------------------------------------------------------------------
+
+5) Marshall:
+
+
+
+package Cleartrippack;
+import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.WebDriver;
+
+import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import org.openqa.selenium.interactions.Actions;
+
+import org.testng.annotations.AfterMethod;
+
+import org.testng.annotations.BeforeMethod;
+
+import org.testng.annotations.Test;
+
+
+
+public class marshall
+
+{
+
+        public static WebDriver driver;
+
+
+
+        @BeforeMethod
+
+        public void beforeMethod() throws Exception
+
+        {
+
+                //System.setProperty("WebDriver.chrome.driver", "D:\\Selenium Training\\chrome driver 2.45\\chromedriver_win32\\chromedriver.exe");
+
+
+
+                //to disable notifications
+
+                /*ChromeOptions chromeOptions = new ChromeOptions();
+
+                chromeOptions.addArguments("--disable-notifications");
+
+                driver = new ChromeDriver(chromeOptions);
+
+
+
+                //to maximize the window size
+
+                driver.manage().window().maximize();
+
+
+
+                //Adding wait time implicitly and launching the Website link
+
+                driver.manage().timeouts().implicitlyWait(60,TimeUnit.SECONDS);*/
+
+         driver = new ChromeDriver();
+
+                driver.get("https://www.marshallspetzone.com/");
+
+                Thread.sleep(3000);
+
+
+
+                }
+
+        @Test
+
+        public void bird() throws Exception
+
+        {
+
+                driver.findElement(By.xpath("//*[@id=\"cbp-hrmenu-tab-14\"]/a/span")).click();
+
+                Thread.sleep(1000);
+
+
+
+                driver.findElement(By.xpath("//div[@class='category-top-menu block-content']//ul//li//a[contains(@href,'https://www.marshallspetzone.com/24-food')]")).click();
+
+                Thread.sleep(1000);
+
+
+
+
+
+                for(int i=1;i<=2;i++)
+
+                {
+
+                        // Products name
+
+                        String ProductName1 = driver.findElement(By.xpath("//*[@id=\"js-product-list\"]/div/div["+ i +"]/article/div[2]/h3/a")).getText();
+
+                        System.out.println("Product " + i + " = " + ProductName1);
+
+
+
+                        // select products
+
+                        driver.findElement(By.xpath("//*[@id=\"js-product-list\"]/div/div["+ i + "]/article/div[2]/h3/a")).click();
+
+
+
+                        //Add to cart
+
+                        if (driver.findElement(By.xpath("//*[@id=\"add-to-cart-or-refresh\"]/div[2]/div/div[2]/div/button")).isEnabled())
+
+                        {
+
+                                driver.findElement(By.xpath("//*[@id=\"add-to-cart-or-refresh\"]/div[2]/div/div[2]/div/button")).click();
+
+                                System.out.println("Proceed to Checkout");
+
+                                System.out.println();
+
+                        }
+
+                        else
+
+                        {
+
+                                System.out.println("Sorry, Out of Stock");
+
+                                System.out.println();
+
+                        }
+
+
+
+                        //Continue Shopping
+
+                        driver.findElement(By.xpath("//*[@id=\"product\"]")).click();
+
+
+
+                        //Going to Products page
+
+                        driver.navigate().back();
+
+                        Thread.sleep(3000);
+
+                }
+
+
+
+                //Items in cart with Sub Total
+
+                driver.findElement(By.xpath("//*[@id='cart-toogle']/i")).click();
+
+                Thread.sleep(3000);
+
+               //*[@id="blockcart-content"]
+
+                String subTotal = driver.findElement(By.xpath("//*[@id='blockcart-content']")).getText();
+
+                // System.out.println("Total Amount = "+ subTotal);
+
+                if(subTotal=="0")
+
+                {
+
+                 System.out.println("There are no more items in your cart");
+
+                }
+
+                else
+
+                {
+
+                 System.out.println(subTotal);
+
+                }
+
+
+
+
+
+        }
+
+@AfterMethod
+
+        public void classbrowser()
+
+        {
+
+                driver.quit();
+
+        }
+
+
+
+}
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+6) Goibibo:
+
+
+
+package Cleartrippack;
+
+
+
+import java.util.concurrent.TimeUnit;
+
+
+
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.Keys;
+
+import org.openqa.selenium.WebDriver;
+
+import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import org.testng.annotations.AfterMethod;
+
+import org.testng.annotations.BeforeMethod;
+
+import org.testng.annotations.Test;
+
+
+
+public class Goibibo {
+
+
+
+    public static WebDriver driver;
+
+
+
+
+
+       @BeforeMethod
+
+       public void test1() throws Exception
+
+       {
+
+          /* ChromeOptions chromeOptions = new ChromeOptions();
+
+      chromeOptions.addArguments("--disable-notifications");
+
+      driver = new ChromeDriver(chromeOptions);
+
+
+
+      driver.manage().window().maximize();
+
+
+
+      driver.manage().timeouts().implicitlyWait(60,TimeUnit.SECONDS);*/
+
+        driver = new ChromeDriver();
+
+      driver.get("https://www.goibibo.com/");
+
+      Thread.sleep(3000);
+
+       }
+
+
+
+
+
+    @Test
+
+    public void searching() throws Exception
+
+    {
+
+
+
+    String Title=driver.getTitle();
+
+    System.out.println(Title);
+
+    Thread.sleep(2000);
+
+
+
+       //driver.switchTo().frame("notification-frame-~2514428c7");
+
+
+
+       //name="notification-frame-~2514428c7"
+
+       // driver.findElement(By.id("webklipper-publisher-widget-container-notification-close-div")).click();
+
+       // Thread.sleep(2000);
+
+    //Thread.sleep(2000);
+
+    driver.findElement(By.xpath("(//*[@class=\"curPointFlt \"])[1]")).click();
+
+    driver.findElement(By.xpath("(//*[@class=\"inputSrch\"])[1]")).click();
+
+    Thread.sleep(2000);
+
+    driver.findElement(By.xpath("(//*[@class=\"inputSrch\"])[1]")).sendKeys("Chennai (MAA)");
+
+    Thread.sleep(500);
+
+    driver.findElement(By.xpath("(//*[@class=\"inputSrch\"])[1]")).sendKeys(Keys.DOWN);
+
+    Thread.sleep(500);
+
+    driver.findElement(By.xpath("(//*[@class=\"inputSrch\"])[1]")).sendKeys(Keys.ENTER);
+
+    Thread.sleep(500);
+
+    //driver.findElement(By.xpath("//*[@id=\"gosuggest_inputDest\"]")).click();
+
+    // Thread.sleep(2000);
+
+    driver.findElement(By.xpath("//*[@id=\"gosuggest_inputDest\"]")).sendKeys("London (LON)");
+
+    Thread.sleep(500);
+
+    driver.findElement(By.xpath("//*[@id=\"gosuggest_inputDest\"]")).sendKeys(Keys.DOWN);
+
+    Thread.sleep(500);
+
+    driver.findElement(By.xpath("//*[@id=\"gosuggest_inputDest\"]")).sendKeys(Keys.ENTER);
+
+    Thread.sleep(500);
+
+    driver.findElement(By.xpath("//*[@id=\"searchWidgetCommon\"]/div[1]/div[1]/div[1]/div/div[5]/input")).click();
+
+
+
+    driver.findElement(By.xpath("//*[@aria-label=\"Wed May 15 2019\"]")).click();
+
+   //*[@aria-label="Sat Apr 27 2019"]
+
+    //driver.findElement(By.xpath(" //*[@aria-label=\"Sun Apr 28 2019\"]")).click();
+
+   // driver.findElement("//*[@id='searchWidgetCommon']/div[1]/div[1]/div[1]/div/div[5]/input")).click();
+
+    //driver.findElement(By.xpath("//*[@class=\"DayPicker-NavButton DayPicker-NavButton--next\"]")).click();
+
+    Thread.sleep(500);
+
+   // driver.findElement(By.xpath(" //*[@id='fare_20190516']")).click();
+
+
+
+    // Thread.sleep(500);
+
+   //*[@id="fare_20190516"]
+
+   //*[@class="DayPicker-NavButton DayPicker-NavButton--next"]
+
+   //*[@aria-label="Tue Apr 30 2019"]
+
+    //driver.findElement(By.xpath(" //*[@aria-label=\"Tue Apr 30 2019\"]")).click();
+
+    //Thread.sleep(500);
+
+   //*[@class="fb button orange large ht55 fltHpySrchBtn"]
+
+    /*driver.findElement(By.xpath("//*[@class=\"DayPicker-NavButton DayPicker-NavButton--next\"]")).click();
+
+    Thread.sleep(500);*/
+
+   //*[@id="searchWidgetCommon"]/div[1]/div[1]/div[1]/div/div[7]/input[1]
+
+
+
+    driver.findElement(By.xpath("//*[@id='searchWidgetCommon']/div[1]/div[1]/div[1]/div/div[7]/input[1]")).click();
+
+    driver.findElement(By.xpath("//*[@aria-label='Sat May 25 2019']")).click();
+
+    Thread.sleep(50000);
+
+    //if two travellers
+
+   //*[@id="pax_link_common"]
+
+  // driver.findElement(By.xpath("//*[@id='pax_link_common']")).click();
+
+   //*[@id="adultPaxPlus"]
+
+   // driver.findElement(By.xpath("//*[@id='adultPaxPlus']")).click();
+
+
+
+    driver.findElement(By.xpath("//*[@id='gi_search_btn']")).click();
+
+   //*[@id="gi_search_btn"]
+
+    driver.findElement(By.xpath(" //*[@class=\"fb button orange large ht55 fltHpySrchBtn\"]")).click();
+
+    Thread.sleep(20000);
+
+    //*[@class="fb"])[2]
+
+   //*[@id="content"]/div/div[2]/div/div[4]/div/div[4]/div[2]/div[1]/div[1]/div[2]/div/div[1]/span[1]/span
+
+       String A= driver.findElement(By.xpath("(//*[@class=\"fb\"])[2]")).getText();
+
+       System.out.println("Departure time:"+A);
+
+       String b= driver.findElement(By.xpath(" (//*[@class=\"fb\"])[3]")).getText();
+
+       System.out.println("arrival time:"+b);
+
+       //*[@class="fr pad5 mobTxtRight blue ico12 txtUln"])[1]
+
+       driver.findElement(By.xpath("(//*[@class=\"button orange fr \"])[1]")).click();
+
+
+
+       Thread.sleep(2000);
+
+      //*[@id="content"]/div/div[2]/div/div[4]/div/div[4]/div[2]/div[2]/div[1]/span/small
+
+
+
+       driver.findElement(By.xpath("(//*[@class=\"fr pad5 mobTxtRight blue ico12 txtUln\"])[1]")).click();
+
+
+
+       Thread.sleep(2000);
+
+
+
+       //*[@id="fltFareRulesTab"]
+
+
+
+       driver.findElement(By.xpath("//*[@id=\"fltFareRulesTab\"]")).click();
+
+
+
+       System.out.println("Button clicked");
+
+
+
+       Thread.sleep(10000);
+
+
+
+       //*[@class="cscell frcell"][1]
+
+
+
+       String C= driver.findElement(By.xpath("(//*[@class=\"cscell frcell\"])[1]")).getText();
+
+
+
+       System.out.println("Fee:"+C);
+
+
+
+       String D= driver.findElement(By.xpath("(//*[@class=\"cscell frcell txtRight bg-greyLtest2\"])[1]")).getText();
+
+
+
+       System.out.println("Fee:"+D);
+
+
+
+       String E= driver.findElement(By.xpath("(//*[@class=\"cscell frcell\"])[2]")).getText();
+
+
+
+       System.out.println("Fee:"+E);
+
+
+
+       String F= driver.findElement(By.xpath("(//*[@class=\"cscell frcell txtRight bg-greyLtest2\"])[2]")).getText();
+
+       System.out.println("Fee:"+F);
+
+
+
+    }
+
+     @AfterMethod
+
+     public void exit()
+
+     {
+
+       driver.quit();
+
+
+
+     }
+
+
+
+}
+
+
+
+-----------------------------------------------------------------------------------------------------------------
+
+PETCOBYSHOBITHA
+
+*****************************************************
+notepad.pw/magic
+MARSHALLPET ZONE
+______________________________________________________
+package Browser;
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class Drivers 
+{
+	WebDriver driver;
+	
+	//public static void main(String[] args)
+	
+	
+	public  WebDriver getchromedriver()
+	{	System.setProperty("webdriver.chrome.driver","C:\\Users\\sbasired\\Downloads\\chromedriver_win32\\chromedriver.exe");
+		WebDriver driver=  new ChromeDriver();
+		driver.manage().deleteAllCookies();
+		driver.manage().window().maximize();
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.get("https://marshallspetzone.com/");
+		return driver;
+		}
+}
+**************************************************************************************************************************************************************************************8
+package screen;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+
+public class Utility
+{
+	public static void screenshoting(WebDriver driver,String Shotname) throws IOException
+	{
+		try {
+			TakesScreenshot ts=(TakesScreenshot)driver;
+			File source = ts.getScreenshotAs(OutputType.FILE);
+		    FileUtils.copyFile(source,new File("./Screenshots/"+Shotname+".png"));
+		} 
+		catch (WebDriverException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+
+***********************************************************************************************************************************8
+package screen;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+
+public class Utility
+{
+	public static void screenshoting(WebDriver driver,String Shotname) throws IOException
+	{
+		try {
+			TakesScreenshot ts=(TakesScreenshot)driver;
+			File source = ts.getScreenshotAs(OutputType.FILE);
+		    FileUtils.copyFile(source,new File("./Screenshots/"+Shotname+".png"));
+		} 
+		catch (WebDriverException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+
+**********************************************************************************************************************************************************package screen;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+
+public class Utility
+{
+	public static void screenshoting(WebDriver driver,String Shotname) throws IOException
+	{
+		try {
+			TakesScreenshot ts=(TakesScreenshot)driver;
+			File source = ts.getScreenshotAs(OutputType.FILE);
+		    FileUtils.copyFile(source,new File("./Screenshots/"+Shotname+".png"));
+		} 
+		catch (WebDriverException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+************************************************************************************************************************************
+package xpath;
+
+public class Path 
+{
+	public static String maincategary="//*[@id='cbp-hrmenu-tab-20']/a/span";
+	public static String subcategary="//*[@id='left-column']/div[1]/div/ul/li[1]/a";
+	//public static String price="";
+	public static String data1="//*[@id=\'js-product-list\']/div/div[1]/article/div[2]/h3/a";
+	public static String view="//*[@id=\'js-product-list-top\']/div/div[2]/a[2]/i";
+	public static String home="//*[@id='desktop_logo']/a/img";
+	public static String button="//*[@id='header-search-btn-drop']/i";
+
+}
+************************************************************************************************************************************************************8
+package Marshallpet;
+
+import java.io.IOException;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import Browser.Drivers;
+import Input.Excelinput;
+import screen.Utility;
+import xpath.Path;
+
+public class Zone extends Drivers
+{
+WebDriver driver;
+
+@BeforeClass
+
+public void beforeclass()
+{
+	driver= getchromedriver();
+	
+}
+@Test
+public void marshallpetzone() throws Exception
+{
+WebElement wb1=driver.findElement(By.xpath(Path.maincategary));
+wb1.click();
+Thread.sleep(1000);
+WebElement wb2=driver.findElement(By.xpath(Path.subcategary));
+wb2.click();
+Thread.sleep(3000);
+Utility.screenshoting(driver, "subscreen");
+System.out.println("Shotname subcategary page");
+/*WebElement wb3=driver.findElement(By.xpath(Path.price));
+wb3.click();*/
+WebElement wb4=driver.findElement(By.xpath(Path.data1));
+
+System.out.println("Data1");
+String itemname = wb4.getText();
+System.out.println("first product name" + itemname );
+Excelinput mne = new Excelinput();
+mne.excel(itemname);
+Thread.sleep(6000);
+WebElement wb5=driver.findElement(By.xpath(Path.view));
+wb5.click();
+Utility.screenshoting(driver,"Shotname gridviewpage");
+System.out.println("Grid view screenshot taken");
+Thread.sleep(5000);
+WebElement wb6=driver.findElement(By.xpath(Path.home));
+wb6.click();
+Thread.sleep(5000);
+WebElement wb7=driver.findElement(By.xpath(Path.button));
+wb7.click();
+}
+@AfterClass
+public void Quit()
+{
+driver.quit();
+}
+}
+**@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@**
+PETCO
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class Drivers 
+{
+	WebDriver driver;
+	
+	//public static void main(String[] args)
+	
+	
+	public  WebDriver getchromedriver()
+	{	System.setProperty("webdriver.chrome.driver","C:\\Users\\sbasired\\Downloads\\chromedriver_win32\\chromedriver.exe");
+		WebDriver driver=  new ChromeDriver();
+		driver.manage().deleteAllCookies();
+		driver.manage().window().maximize();
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.get("https://www.petco.com/shop/en/petcostore");
+		return driver;
+		}
+}
+
+**********************************************************************************************************************************8
+package screen;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+
+public class Utility
+{
+	public static void screenshoting(WebDriver driver,String Shotname) throws IOException
+	{
+		try {
+			TakesScreenshot ts=(TakesScreenshot)driver;
+			File source = ts.getScreenshotAs(OutputType.FILE);
+		    FileUtils.copyFile(source,new File("./Screenshots/"+Shotname+".png"));
+		} 
+		catch (WebDriverException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+
+*********************************************************************************
+package Input;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class Excelinput 
+{
+	
+		public void excel(String abc) throws Exception
+		{
+			FileInputStream fis = new FileInputStream("C:\\Users\\sbasired\\eclipse-workspace\\Petco\\src\\Petcodata.xlsx");
+			XSSFWorkbook wb = new XSSFWorkbook(fis);
+			XSSFSheet s = wb.getSheet("Sheet1");
+			Row r = s.createRow(0);
+			Cell c = r.createCell(0);
+			c.setCellValue(abc);
+			FileOutputStream fos = new FileOutputStream("C:\\Users\\sbasired\\eclipse-workspace\\Petco\\src\\Petcodata.xlsx");
+			wb.write(fos);
+			fos.close();
+		}
+		public static String cellvalue(int row, int column) throws Exception
+		{
+			FileInputStream fis = new FileInputStream("C:\\Users\\sbasired\\eclipse-workspace\\Petco\\src\\Petcodata.xlsx");
+			XSSFWorkbook wb = new XSSFWorkbook(fis);
+			XSSFSheet s = wb.getSheet("Sheet1");
+			String data1 = s.getRow(0).getCell(0).getStringCellValue();
+			return data1;
+		}
+}
+888888888888888*********************************************************************************************
+package Xpath;
+
+public class Path 
+{
+	public static String pet="//*[@id=\'shop-by-pet\']/a";
+	public static String dog="//*[@id=\'shop-by-pet-dog\']/a";
+	public static String food="//*[@id=\'dogHP-feat-categories\']/div/ul/li[1]/a/p";
+	public static String subcatogory="//*[@id=\'SBN_Vet-Authorized Diet Dog Food_3_3074457345618259658_4099276460824412679\']/div";
+	public static String atoz="//*[@id=\'product-listing-sort-by_4_3074457345618259661_4099276460824443117\']";
+	public static String secondpro="//*[@id=\'product_tile_val_2457002\']/span/span";
+	public static String secondprice="//*[@id=\"product-price_2457002\"]/div/span[1]";
+	public static String underprice="//*[@id=\'facetDiv12095115111114116951121141059910195801011169911183116111114101958583685840123494832505312532505341\']/label/i";
+	public static String firstproduct="//*[@id=\'product_tile_val_1021503\']/span";
+}
+
+*********************************************************************************
+package Petcoproject;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import Browser.Drivers;
+import Input.Excelinput;
+import Xpath.Path;
+
+public class Scarching extends Drivers 
+{
+	
+		WebDriver driver;
+
+		@BeforeClass
+
+		public void beforeclass()
+		{
+			driver= getchromedriver();
+			
+		}
+		@Test
+		public void marshallpetzone() throws Exception
+		{
+			/*WebElement wb=driver.findElement(By.xpath(Path.thanks));
+			wb.click();*/
+		WebElement wb1=driver.findElement(By.xpath(Path.pet));
+		wb1.click();
+		WebElement wb2=driver.findElement(By.xpath(Path.dog));
+		wb2.click();
+		WebElement wb3=driver.findElement(By.xpath(Path.food));
+		wb3.click();
+		WebElement wb4=driver.findElement(By.xpath(Path.subcatogory));
+		wb4.click();
+		/*WebElement wb5=driver.findElement(By.xpath(Path.atoz));
+		wb5.click();
+	    wb5.sendKeys(Keys.DOWN);*/
+	    Select wb5=new Select(driver.findElement(By.xpath(Path.atoz)));
+	    //wb5.selectByVisibleText("Name A-Z");]
+	
+		wb5.selectByIndex(2);
+		Thread.sleep(2000);
+		
+		WebElement wb6=driver.findElement(By.xpath(Path.secondpro));
+		
+		String itemname = wb6.getText();
+		System.out.println("second product name" + itemname );
+		
+		WebElement wb7=driver.findElement(By.xpath(Path.secondprice));
+		String itemprice = wb7.getText();
+		
+		System.out.println("second product price" + itemprice );
+		Thread.sleep(2000);
+		WebElement wb8=driver.findElement(By.xpath(Path.underprice));
+		wb8.click();
+		Thread.sleep(2000);
+		WebElement wb9=driver.findElement(By.xpath(Path.firstproduct));
+		wb9.click();
+		Thread.sleep(2000);
+		String firstitemname = wb9.getText();
+		System.out.println("first product name" + firstitemname );
+		Excelinput mne = new Excelinput();
+		mne.excel(firstitemname);
+}
+		@AfterClass
+		public void quit()
+		{
+			driver.close();
+		}
+}
